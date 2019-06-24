@@ -7,6 +7,12 @@
 
 #include <iostream>
 #include <string>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+#define SOCKET int
+#define INVALID_SOCKET (SOCKET)(~0)
+#define SOCKET_ERROR -1
 
 namespace SocketInterface
 {
@@ -20,7 +26,7 @@ public:
 
     }
 
-    virtual int fd() = 0;
+    virtual SOCKET fd() = 0;
     //初始化套接字，0/成功，-1/失败
     virtual int initSocket() = 0;
     //设置该套接字是否阻塞，0/成功，-1/失败
@@ -38,10 +44,9 @@ class ServerInterface
 public:
     virtual ~ServerInterface()
     {
-
     }
 
-    virtual int fd() = 0;
+    virtual SOCKET fd() = 0;
     virtual int initSocket(size_t backlog) = 0;
     //设置该套接字是否阻塞，0/成功，-1/失败
     virtual int setNonBlocking(bool block) = 0;

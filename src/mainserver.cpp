@@ -24,12 +24,13 @@ int MainServer::initSocket(size_t backlog)
     m_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(INVALID_SOCKET == m_sockfd)
     {
-        //log
+        Logger::log(Logger::All, "Socket initialized failed.");
         return -1;
     }
-    //log
+    Logger::log(Logger::All, "Socket initialized successfully.");
     return 0;
-
 }
+
+
 
 } // namespace Socket

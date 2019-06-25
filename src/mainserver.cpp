@@ -98,7 +98,8 @@ SocketInterface::ClientInterface *MainServer::acceptSocket()
     }
     Logger::log(Logger::All, "Client connection successfully.");
 
-    //return client
+    SocketInterface::ClientInterface *client = new MainClient(cSock);
+    return client;
 }
 
 } // namespace Socket

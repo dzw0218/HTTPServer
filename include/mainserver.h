@@ -2,6 +2,7 @@
 #define MAINSERVER_H_
 
 #include "socketinterface.h"
+#include "mainclient.h"
 #include <mutex>
 #include <string>
 

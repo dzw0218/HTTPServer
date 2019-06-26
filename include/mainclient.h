@@ -22,8 +22,8 @@ public:
     int closeSocket();
     bool isRun();
     int connect(const std::string& ip, unsigned int port);
-    ssize_t recv(void *buf, size_t len, int flags = 0);
-    ssize_t send(const void *buf, size_t len, int flags = 0);
+    size_t recv(void *buf, size_t len, int flags = 0);
+    size_t send(const void *buf, size_t len, int flags = 0);
 
 private:
     SOCKET m_sockfd;

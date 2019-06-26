@@ -1,6 +1,31 @@
-TARGET = HTTPServer
+# build param
+CC = g++
+CFLAGS = -std=c++11 -pthread -Wall -g
 
-SRC = src
+# directory
+BINDIR = bin
+OBJDIR = $(BINDIR)/obj
+TARGET = $(BINDIR)/HTTPServer
+
 INCLUDE = include
-CC = gcc
+SRCDIR = src
 
+# build directory
+ALL_INCLUDE += $(patsubst %, -I%, $(INCLUDE))
+ALL_SRC += $(wildcard $(SRCDIR)/*.cpp)
+ALL_OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(ALL_SRC))
+
+# make obj directory
+$(shell mkdir -p $(OBJDIR))
+
+# build
+$(TARGET) : $(ALL_OBJ)
+	$(CC) $(CFLAGS) $(ALL_INCLUDE) $^ -o $@
+
+$(OBJDIR)/%.o : %.cpp
+	$(CC) $(CFLAGS) $(ALL_INCLUDE) -c $< -o $@
+
+# clean
+.PHONY:clean
+clean:
+	-rm $(BINDIR)/* $(BINDIR) -rf

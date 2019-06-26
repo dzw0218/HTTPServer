@@ -97,7 +97,7 @@ int MainClient::connect(const std::string &ip, unsigned int port)
     return 0;
 }
 
-ssize_t MainClient::recv(void *buf, size_t len, int flags)
+size_t MainClient::recv(void *buf, size_t len, int flags)
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     if(INVALID_SOCKET == m_sockfd)
@@ -106,14 +106,14 @@ ssize_t MainClient::recv(void *buf, size_t len, int flags)
     return recv(m_sockfd, buf, len, flags);
 }
 
-ssize_t MainClient::send(const void *buf, size_t len, int flags)
+size_t MainClient::send(const void *buf, size_t len, int flags)
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     if(INVALID_SOCKET == m_sockfd)
         return -1;
 
     size_t nLen = 0;
-    ssize_t ret = 0;
+    size_t ret = 0;
     do
     {
         ret = send(m_sockfd, buf + nLen, len - nLen, flags);

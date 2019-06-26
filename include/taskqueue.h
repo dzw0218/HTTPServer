@@ -4,6 +4,7 @@
 #include <iostream>
 #include <queue>
 #include <mutex>
+#include <condition_variable>
 
 namespace TaskQueue
 {
@@ -29,7 +30,7 @@ public:
 };
 
 template<class TYPE>
-class MyQueue : public QueueInterface
+class MyQueue : public QueueInterface<TYPE>
 {
 public:
     MyQueue(size_t queuelen);

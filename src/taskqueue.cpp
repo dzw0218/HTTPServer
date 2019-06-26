@@ -3,7 +3,8 @@
 namespace TaskQueue
 {
 
-MyQueue::MyQueue(size_t queuelen)
+template<class TYPE>
+MyQueue<TYPE>::MyQueue(size_t queuelen)
     : queue_size(queuelen),
     free_flag(true),
     fill_flag(false)
@@ -11,18 +12,21 @@ MyQueue::MyQueue(size_t queuelen)
 
 }
 
-MyQueue::~MyQueue()
+template<class TYPE>
+MyQueue<TYPE>::~MyQueue()
 {
 
 }
 
-size_t MyQueue::size()
+template<class TYPE>
+size_t MyQueue<TYPE>::size()
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     return (size_t)m_queue.size();
 }
 
-int MyQueue::clear()
+template<class TYPE>
+int MyQueue<TYPE>::clear()
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     while(!m_queue.empty())
@@ -30,7 +34,8 @@ int MyQueue::clear()
     return 0;
 }
 
-TYPE& MyQueue::popTask()
+template<class TYPE>
+TYPE& MyQueue<TYPE>::popTask()
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     while(0 == m_queue.size())
@@ -50,7 +55,8 @@ TYPE& MyQueue::popTask()
     return out;
 }
 
-TYPE& MyQueue::popTaskNB()
+template<class TYPE>
+TYPE& MyQueue<TYPE>::popTaskNB()
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     if(0 == m_queue.size())
@@ -68,7 +74,8 @@ TYPE& MyQueue::popTaskNB()
     return out;
 }
 
-int MyQueue::pushTask(TYPE& in)
+template<class TYPE>
+int MyQueue<TYPE>::pushTask(TYPE& in)
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     while(m_queue.size() == queue_size)
@@ -88,7 +95,8 @@ int MyQueue::pushTask(TYPE& in)
     return 0;
 }
 
-int MyQueue::pushTaskNB(TYPE& in)
+template<class TYPE>
+int MyQueue<TYPE>::pushTaskNB(TYPE& in)
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     if(m_queue.size() == queue_size)

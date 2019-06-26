@@ -13,7 +13,7 @@ SRCDIR = src
 # build directory
 ALL_INCLUDE += $(patsubst %, -I%, $(INCLUDE))
 ALL_SRC += $(wildcard $(SRCDIR)/*.cpp)
-ALL_OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(ALL_SRC))
+ALL_OBJ += $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(ALL_SRC))
 
 # make obj directory
 $(shell mkdir -p $(OBJDIR))
@@ -22,7 +22,7 @@ $(shell mkdir -p $(OBJDIR))
 $(TARGET) : $(ALL_OBJ)
 	$(CC) $(CFLAGS) $(ALL_INCLUDE) $^ -o $@
 
-$(OBJDIR)/%.o : %.cpp
+$(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 	$(CC) $(CFLAGS) $(ALL_INCLUDE) -c $< -o $@
 
 # clean

@@ -13,7 +13,7 @@ class MainServer : public SocketInterface::ServerInterface
 {
 public:
     MainServer(const std::string &ip, unsigned int port);
-    ~MainServer();
+    virtual ~MainServer();
 
     SOCKET fd();
     int initSocket(size_t backlog);

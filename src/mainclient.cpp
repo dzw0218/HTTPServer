@@ -1,4 +1,8 @@
 #include "mainclient.h"
+#include "log.h"
+#include <fcntl.h>
+
+using Logger::log;
 
 namespace Socket
 {
@@ -10,15 +14,14 @@ MainClient::MainClient()
 }
 
 MainClient::MainClient(SOCKET fd)
-    : sockfd(fd)
+    : m_sockfd(fd)
 {
 
 }
 
 MainClient::MainClient(const MainClient& client)
-    : m_sockfd(cleint->fd())
 {
-
+    m_sockfd = client.m_sockfd;
 }
 
 MainClient::~MainClient()
@@ -36,20 +39,20 @@ int MainClient::initSocket()
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     if(INVALID_SOCKET != m_sockfd)
-        return;
+        return -1;
 
     m_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(INVALID_SOCKET == m_sockfd)
     {
-        Logger::log(Logger::All, "Client socket initialized failed.");
+        log(Logger::All, "Client socket initialized failed.");
         return -1;
     }
-    Logger::log(Logger::All, "Client socket initialized successfully.");
+    log(Logger::All, "Client socket initialized successfully.");
 
     return 0;
 }
 
-int MainClient::setNonBlock(bool block)
+int MainClient::setNonBlocking(bool block)
 {
     int flags = fcntl(m_sockfd, F_GETFL, 0);
     if(block)
@@ -65,7 +68,9 @@ int MainClient::closeSocket()
     if(m_sockfd != INVALID_SOCKET)
     {
         close(m_sockfd);
+        return 0;
     }
+    return -1;
 }
 
 bool MainClient::isRun()
@@ -74,7 +79,7 @@ bool MainClient::isRun()
     return m_sockfd != INVALID_SOCKET;
 }
 
-int MainClient::connect(const std::string &ip, unsigned int port)
+int MainClient::connectSocket(const std::string &ip, unsigned int port)
 {
     std::unique_lock<std::mutex> lck(m_mutex);
     if(INVALID_SOCKET == m_sockfd)
@@ -84,15 +89,14 @@ int MainClient::connect(const std::string &ip, unsigned int port)
     _sin.sin_family = AF_INET;
     _sin.sin_port = htons(port);
     _sin.sin_addr.s_addr = ip.empty() ? INADDR_ANY : inet_addr(ip.c_str());
-    int len = sizeof(_sin);
     
-    int ret = connect(m_sockfd, (sockaddr*)&_sin, (socklen_t*)&len);
+    int ret = connect(m_sockfd, (sockaddr*)&_sin, sizeof(sockaddr_in));
     if(ret < 0)
     {
-        Logger::log(Logger::All, "Client connect to server failed.");
+        log(Logger::All, "Client connect to server failed.");
         return -1;
     }
-    Logger::log(Logger::All, "Client connect to server successfully.");
+    log(Logger::All, "Client connect to server successfully.");
 
     return 0;
 }
@@ -103,7 +107,7 @@ size_t MainClient::recv(void *buf, size_t len, int flags)
     if(INVALID_SOCKET == m_sockfd)
         return -1;
 
-    return recv(m_sockfd, buf, len, flags);
+    return ::recv(m_sockfd, buf, len, flags);
 }
 
 size_t MainClient::send(const void *buf, size_t len, int flags)
@@ -116,7 +120,7 @@ size_t MainClient::send(const void *buf, size_t len, int flags)
     size_t ret = 0;
     do
     {
-        ret = send(m_sockfd, buf + nLen, len - nLen, flags);
+        ret = ::send(m_sockfd, buf + nLen, len - nLen, flags);
         if(ret < 0)
         {
             if(errno != EINTR)
@@ -125,7 +129,7 @@ size_t MainClient::send(const void *buf, size_t len, int flags)
                 continue;
         }
         nLen += ret;
-    }while(nLen != len)
+    }while(nLen != len);
 
     return nLen;
 }

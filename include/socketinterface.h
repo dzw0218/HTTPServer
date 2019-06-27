@@ -14,14 +14,14 @@
 #define INVALID_SOCKET (SOCKET)(~0)
 #define SOCKET_ERROR -1
 
-namespace SocketDest
+namespace SocketInterface
 {
 
-class SocketInterface
+class SocketDest
 {
 public:
     virtual SOCKET fd() = 0;
-    virtual setNonBlocking(bool block) = 0;
+    virtual int setNonBlocking(bool block) = 0;
     virtual int closeSocket() = 0;
 };
 

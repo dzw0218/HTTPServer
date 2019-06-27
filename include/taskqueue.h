@@ -45,6 +45,7 @@ public:
 
 private:
     typedef std::queue<TYPE> queue_t;
+    
     std::mutex m_mutex;
     bool fill_flag;
     std::condition_variable cv_fill;

@@ -9,13 +9,11 @@ MyQueue<TYPE>::MyQueue(size_t queuelen)
     free_flag(true),
     fill_flag(false)
 {
-
 }
 
 template<class TYPE>
 MyQueue<TYPE>::~MyQueue()
 {
-
 }
 
 template<class TYPE>

@@ -37,7 +37,7 @@ void MyThreadPool::destoryThreadpool()
     while(iter != m_threadpool.end())
     {
         (*iter)->join();
-        delete (*iter);
+        delete *iter;
         ++iter;
     }
     m_threadpool.clear();
@@ -70,9 +70,7 @@ void* MyThreadPool::process_task(void *args)
         currentThread.join_follower();
 
         if(handler)
-        {
             handler->taskHandle();
-        }
     }
 }
 

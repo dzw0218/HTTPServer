@@ -3,7 +3,6 @@
 
 #include "taskqueue.h"
 #include <iostream>
-#include <queue>
 #include <vector>
 #include <thread>
 #include <mutex>
@@ -12,17 +11,17 @@
 namespace ThreadPool
 {
 
-class ThreadHandle
+class ThreadHandle //线程池线程处理虚基类
 {
-    friend class MyThreadPool;
 public:
+    friend class MyThreadPool;
     virtual ~ThreadHandle(){};
 
 protected:
     virtual void taskHandle() = 0;
 };
 
-class ThreadPool
+class ThreadPool //线程池虚基类
 {
 public:
     virtual ~ThreadPool(){};
@@ -30,7 +29,7 @@ public:
     virtual int pushTask(ThreadHandle *task, bool block = false) = 0;
 };
 
-class MyThreadPool : public ThreadPool
+class MyThreadPool : public ThreadPool //线程池类
 {
 public:
     enum Config
@@ -38,7 +37,7 @@ public:
         ThreadNum = 64,
         TaskNum = 2018
     };
-    //typedef void*(m_threadpro)(void *);
+    typedef void*(m_threadpro)(void *);
     typedef std::vector<std::thread *> threadpool_t;
     typedef TaskQueue::MyQueue<ThreadHandle *> taskqueue_t;
     //typedef std::priority_queue<ThreadHandle *> taskpriorityqueue_t;
@@ -64,7 +63,7 @@ private:
     //taskpriorityqueue_t m_taskpriorityqueue;
 };
 
-class ThreadPoolProxy : public ThreadPool
+class ThreadPoolProxy : public ThreadPool //线程池代理类
 {
 public:
     static ThreadPool* instance();

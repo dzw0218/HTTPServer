@@ -74,9 +74,11 @@ public:
     TYPE& popTaskNB()
     {
         std::unique_lock<std::mutex> lck(m_mutex);
-        if(0 == m_queue.size())
-            return (TYPE)0;
-
+        if(m_queue.size() == 0)
+        {
+            TYPE *temp = nullptr;
+            return *temp;
+        }
         TYPE out = m_queue.front();
         m_queue.pop();
 

@@ -33,15 +33,96 @@ template<class TYPE>
 class MyQueue : public QueueInterface<TYPE>
 {
 public:
-    MyQueue(size_t queuelen);
-    ~MyQueue();
+    MyQueue(size_t queuelen)
+        : queue_size(queuelen),
+        fill_flag(false)
+    {}
+    ~MyQueue()
+    {}
 
-    size_t size();
-    int clear();
-    TYPE& popTask();
-    TYPE& popTaskNB();
-    int pushTask(TYPE &in);
-    int pushTaskNB(TYPE &in);
+    size_t size()
+    {
+        std::unique_lock<std::mutex> lck(m_mutex);
+        return (size_t)m_queue.size();
+    }
+    int clear()
+    {
+        std::unique_lock<std::mutex> lck(m_mutex);
+        while(!m_queue.empty())
+            m_queue.pop();
+        return 0;
+    }
+    TYPE& popTask()
+    {
+        std::unique_lock<std::mutex> lck(m_mutex);
+        while(0 == m_queue.size())
+        {
+            fill_flag = true;
+            cv_fill.wait(lck);
+        }
+
+        TYPE out = m_queue.front();
+        m_queue.pop();
+
+        if(free_flag)
+        {
+            cv_free.notify_one();
+            free_flag = false;
+        }
+        return out;
+    }
+    TYPE& popTaskNB()
+    {
+        std::unique_lock<std::mutex> lck(m_mutex);
+        if(0 == m_queue.size())
+            return (TYPE)0;
+
+        TYPE out = m_queue.front();
+        m_queue.pop();
+
+        if(free_flag)
+        {
+            cv_free.notify_one();
+            free_flag = false;
+        }
+
+        return out;
+    }
+    int pushTask(TYPE &in)
+    {
+        std::unique_lock<std::mutex> lck(m_mutex);
+        while(m_queue.size() == queue_size)
+        {
+            free_flag = true;
+            cv_free.wait(lck);
+        }
+
+        m_queue.push(in);
+
+        if(fill_flag)
+        {
+            cv_fill.notify_one();
+            fill_flag = false;
+        }
+        
+        return 0;
+    }
+    int pushTaskNB(TYPE &in)
+    {
+        std::unique_lock<std::mutex> lck(m_mutex);
+        if(m_queue.size() == queue_size)
+            return -1;
+
+        m_queue.push(in);
+
+        if(fill_flag)
+        {
+            cv_fill.notify_one();
+            fill_flag = false;
+        }
+
+        return 0;
+    }
 
 private:
     typedef std::queue<TYPE> queue_t;

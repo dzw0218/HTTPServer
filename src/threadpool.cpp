@@ -4,8 +4,8 @@ namespace ThreadPool
 {
 
 MyThreadPool::MyThreadPool(size_t threadnum, size_t tasknum)
-    : m_taskqueue(tasknum), 
-    m_hasleader(false)
+    : m_hasleader(false),
+    m_taskqueue(tasknum)
 {
     m_threadnum = (threadnum > ThreadNum) ? ThreadNum : threadnum;
     createThreadpool();

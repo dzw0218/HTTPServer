@@ -19,7 +19,7 @@ int Handler::shutdown_event(int fd)
     return EventProxy::instance()->shutdown_event(fd);
 }
 
-int shutdown_event(SocketInterface::SocketDest &socket)
+int Handler::shutdown_event(SocketInterface::SocketDest &socket)
 {
     return EventProxy::instance()->shutdown_event(socket);
 }

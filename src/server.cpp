@@ -5,6 +5,7 @@
 int main()
 {
     HTTPSERVER::HTTPServer httpserver("0.0.0.0", 8080);
+	Logger::log(Logger::All, "HTTPServer starting...");
     if(httpserver.start(1024) < 0)
         return -1;
 

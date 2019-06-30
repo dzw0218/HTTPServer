@@ -57,10 +57,10 @@ int MainServer::initSocket(size_t backlog)
     if(SOCKET_ERROR == bind(m_sockfd, (sockaddr*)&_sin, sizeof(sockaddr_in)))
     {
         std::string message;
-        //message.append("Bind server ");
-        //message.append(m_ip.c_str());
-        //message.push_back(m_port);
-        //message.append(" failed.");
+        message.append("Bind server ");
+        message.append(m_ip.c_str());
+        message.push_back(m_port);
+        message.append(" failed.");
         Logger::log(Logger::All, message.c_str());
         return -1;
     }

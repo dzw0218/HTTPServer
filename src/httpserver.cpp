@@ -1,4 +1,5 @@
 #include "httpserver.h"
+#include "log.h"
 #include <cstring>
 #include <sys/stat.h>
 #include <libgen.h>
@@ -170,14 +171,22 @@ HTTP::HTTPResponse* HTTPStream::handle_request(HTTP::HTTPRequest& request)
 //HTTPServer实现
 int HTTPServer::start(int backlog)
 {
-    if(!m_server.isRun())
+    if(m_server.isRun())
+	{
+		Logger::log(Logger::Console, "Server is running...");
         return 0;
+	}
     
     if(m_server.initSocket(backlog) < 0)
+	{
+		Logger::log(Logger::Console, "Initialize socket failed.");
         return -1;
+	}
 
     if(m_server.setNonBlocking(true) < 0)
-    {}
+    {
+		Logger::log(Logger::Console, "Server set no block failed.");
+	}
 
     return register_event(m_server);
 }

@@ -1,5 +1,6 @@
 #include "http.h"
 #include <cstring>
+#include "log.h"
 
 namespace HTTP
 {
@@ -361,8 +362,6 @@ const char* MyHTTPResponse::serialize()
 
     size_t totalsize = size();
     char* buffserver = new char[totalsize];
-    if(buffserver == nullptr)
-        return "";
     
     char* buff = buffserver;
     int nprint = snprintf(buff, totalsize, "%s %s %s\r\n", m_package.version.c_str(), m_package.status.c_str(), m_package.reason.c_str());
@@ -390,7 +389,9 @@ const char* MyHTTPResponse::serialize()
         totalsize -= nprint;
         buff += nprint;
     }
+	
 
+    totalsize -= nprint;
     nprint = snprintf(buff, totalsize, "\r\n");
     if(nprint < 0)
     {
@@ -400,11 +401,12 @@ const char* MyHTTPResponse::serialize()
     totalsize -= nprint;
     buff += nprint;
 
-    memcpy(buff, m_package.data, totalsize);
+    memcpy(buff, m_package.body, totalsize);
     if(totalsize != m_package.bodylen)
     {
-        //todo
+       	Logger::log(Logger::All, "some data length is wrong");
     }
+
     if(m_package.data != nullptr)
         delete m_package.data;
     m_package.data = buffserver;

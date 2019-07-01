@@ -35,7 +35,8 @@ class MyQueue : public QueueInterface<TYPE>
 public:
     MyQueue(size_t queuelen)
         : queue_size(queuelen),
-        fill_flag(false)
+        fill_flag(false),
+		free_flag(true)
     {}
     ~MyQueue()
     {}

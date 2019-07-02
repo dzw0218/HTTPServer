@@ -19,7 +19,9 @@ MyThreadPool::~MyThreadPool()
 int MyThreadPool::pushTask(ThreadHandle *task, bool block)
 {
     if(block)
+	{
         return m_taskqueue.pushTask(task);
+	}
     return m_taskqueue.pushTaskNB(task);
 }
 
@@ -29,6 +31,8 @@ void MyThreadPool::createThreadpool()
     {
         m_threadpool.push_back(new std::thread(process_task, (void*)this));
     }
+	for(size_t index = 0; index < m_threadnum; ++index)
+		m_threadpool[index]->detach();
 }
 
 void MyThreadPool::destoryThreadpool()

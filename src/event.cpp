@@ -97,9 +97,12 @@ MyEvent::MyEvent(size_t event_max)
     if(m_epollfd < 0)
         Logger::log(Logger::All, "epoll create failed.");
 
+	Logger::log(Logger::Console, "Epoll create successfully");
+
     m_threadpool = ThreadPool::ThreadPoolProxy::instance();
 
     m_thread = std::thread(&MyEvent::eventwait, this);
+    m_thread.detach();
 }
 
 MyEvent::~MyEvent()
@@ -121,6 +124,7 @@ int MyEvent::register_event(int fd, Handler *handle, EventType type)
     event.events = type;
 
     Exist ret = isExist(fd, type, handle);
+	//std::cout << "[debug] fd is exist:" << ret << std::endl;
     if(ret == Existed)
         return 0;
 
@@ -178,9 +182,10 @@ MyEvent::Exist MyEvent::isExist(int fd, EventType type, Handler *handler)
 
 int MyEvent::record(int fd, EventType type, Handler *handler)
 {
+	std::unique_lock<std::mutex> lck(m_eventobserver_mutex);
+
     MyObserver *observer = new MyObserver(*handler, type);
 
-    std::unique_lock<std::mutex> lck(m_eventobserver_mutex);
     m_eventobserver[fd] = observer;
     return 0;
 }
@@ -304,13 +309,19 @@ void* MyEvent::eventwait(void *args)
 
     while(true)
     {
+        Logger::log(Logger::Console, "epoll wait is running...");
         int nEvent = epoll_wait(event.m_epollfd, &event.m_event[0], EventLen, -1);
+	std::cout << "[debug event.cpp] client number:" << nEvent << std::endl;
         if(nEvent < 0 && errno == EINTR)
+        {
+            Logger::log(Logger::Console, "epoll is broken.");
             break;
+        }
 
         for(int index = 0; index < nEvent; ++index)
         {
             int fd = event.m_event[index].data.fd;
+			std::cerr << "[debug] m_epoll fd: " << event.m_epollfd << " epoll ready fd:" << fd << std::endl;
             EventType type = static_cast<EventType>(event.m_event[index].events);
 
             if(event.pushTask(fd, type) == 0)

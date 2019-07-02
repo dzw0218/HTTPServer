@@ -71,8 +71,10 @@ int HTTPStream::close()
 
 void HTTPStream::epoll_handlein(int fd)
 {
+	std::cerr << "[debug] client running." << std::endl;
     std::unique_lock<std::mutex> lck(m_mutex);
     size_t nread = m_client->recv(m_readbuf, READBUFFLEN, MSG_DONTWAIT);
+	std::cerr << "[debug] client recv data length:" << nread << std::endl;
     if((nread < 0 && nread != EAGAIN) || nread == 0)
     {
         close();
@@ -83,20 +85,27 @@ void HTTPStream::epoll_handlein(int fd)
         return;
     }
 
-    m_readbuf[nread] = 0;
+    m_readbuf[nread] = '\0';
 
     HTTP::MyHTTPRequest httprequest;
     if(httprequest.loadPacket(m_readbuf, nread) < 0)
     {
+		std::cerr << "[debug] load packet failed." << std::endl;
         return;
     }
 
     HTTP::HTTPResponse *response = handle_request(httprequest);
     if(response != nullptr)
     {
-        m_client->send(response->serialize(), response->size(), 0);
+		std::cout << "[debug httpserver.cpp] send data starting..." << std::endl;
+		std::cerr << "[debug httpserver.cpp] response size:" << response->size() << std::endl;
+		std::cerr << "[debug httpserver.cpp] response serialize pointer:" << response->serialize() << std::endl;
+        int ret = m_client->send(response->serialize(), response->size(), 0);
+		std::cerr << "[debug] send ret: " << ret << std::endl;
         delete response;
+		response = nullptr;
     }
+	std::cerr << "[debug] client handle running" << std::endl;
 }
 
 void HTTPStream::epoll_handleout(int fd)

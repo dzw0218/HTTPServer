@@ -1,5 +1,5 @@
 # HTTPServer
-基于Nginx、epoll的异步事件驱动HTTP服务器，主要语言为C++
+基于epoll的异步事件驱动HTTP服务器，版本为C++11
 
 ## 基于epoll的异步事件驱动框架
 

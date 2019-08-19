@@ -71,10 +71,8 @@ int HTTPStream::close()
 
 void HTTPStream::epoll_handlein(int fd)
 {
-	std::cerr << "[debug] client running." << std::endl;
     std::unique_lock<std::mutex> lck(m_mutex);
     size_t nread = m_client->recv(m_readbuf, READBUFFLEN, MSG_DONTWAIT);
-	std::cerr << "[debug] client recv data length:" << nread << std::endl;
     if((nread < 0 && nread != EAGAIN) || nread == 0)
     {
         close();
@@ -90,22 +88,16 @@ void HTTPStream::epoll_handlein(int fd)
     HTTP::MyHTTPRequest httprequest;
     if(httprequest.loadPacket(m_readbuf, nread) < 0)
     {
-		std::cerr << "[debug] load packet failed." << std::endl;
         return;
     }
 
     HTTP::HTTPResponse *response = handle_request(httprequest);
     if(response != nullptr)
     {
-		std::cout << "[debug httpserver.cpp] send data starting..." << std::endl;
-		std::cerr << "[debug httpserver.cpp] response size:" << response->size() << std::endl;
-		std::cerr << "[debug httpserver.cpp] response serialize pointer:" << response->serialize() << std::endl;
         int ret = m_client->send(response->serialize(), response->size(), 0);
-		std::cerr << "[debug] send ret: " << ret << std::endl;
         delete response;
 		response = nullptr;
     }
-	std::cerr << "[debug] client handle running" << std::endl;
 }
 
 void HTTPStream::epoll_handleout(int fd)
@@ -138,6 +130,7 @@ HTTP::HTTPResponse* HTTPStream::handle_request(HTTP::HTTPRequest& request)
         std::string extention = HTTP::extention_name(filepath);
         if(extention.empty() || access(filepath.c_str(), R_OK) < 0)
         {
+            std::cerr << "404" << std::endl;
             response->setVersion(HTTP_VERSION);
             response->setStatus("404", "Not Found");
             response->addHeader(HTTP_HEAD_CONNECTION, "close");
@@ -153,6 +146,7 @@ HTTP::HTTPResponse* HTTPStream::handle_request(HTTP::HTTPRequest& request)
         FILE* fp = fopen(filepath.c_str(), "rb");
         if(fp == nullptr || fread(fbuff, filesize, 1, fp) != 1)
         {
+            std::cerr << "500" << std::endl;
             delete fbuff;
 
             response->setVersion(HTTP_VERSION);
@@ -171,7 +165,9 @@ HTTP::HTTPResponse* HTTPStream::handle_request(HTTP::HTTPRequest& request)
         response->addHeader(HTTP_HEAD_CONTENT_TYPE, HTTP::http_content_type(extention));
         response->addHeader(HTTP_HEAD_CONTENT_LEN, sfilesize);
         response->addHeader(HTTP_HEAD_CONNECTION, "close");
-        response->setBody(fbuff, filesize);
+        std::cout << "setBody fbuff filesize" << fbuff << "size:" << filesize << std::endl;
+        response->setBody(std::string(fbuff, filesize), filesize);
+        std::cerr << "setbody over" << std::endl;
         delete fbuff;
     }
     return response;

@@ -3,7 +3,7 @@ CC = g++
 CFLAGS = -std=c++11 -pthread -Wall -g
 
 # directory
-BINDIR = bin
+BINDIR = .
 OBJDIR = $(BINDIR)/obj
 TARGET = $(BINDIR)/HTTPServer
 
@@ -16,7 +16,7 @@ ALL_SRC += $(wildcard $(SRCDIR)/*.cpp)
 ALL_OBJ += $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(ALL_SRC))
 
 # make obj directory
-$(shell mkdir -p $(OBJDIR))
+#$(shell mkdir -p $(OBJDIR))
 
 # build
 $(TARGET) : $(ALL_OBJ)

@@ -62,7 +62,7 @@ public:
             cv_fill.wait(lck);
         }
 
-        TYPE out = m_queue.front();
+        TYPE& out = m_queue.front();
         m_queue.pop();
 
         if(free_flag)
@@ -80,7 +80,7 @@ public:
             TYPE *temp = nullptr;
             return *temp;
         }
-        TYPE out = m_queue.front();
+        TYPE& out = m_queue.front();
         m_queue.pop();
 
         if(free_flag)

@@ -311,7 +311,6 @@ void* MyEvent::eventwait(void *args)
     {
         Logger::log(Logger::Console, "epoll wait is running...");
         int nEvent = epoll_wait(event.m_epollfd, &event.m_event[0], EventLen, -1);
-	std::cout << "[debug event.cpp] client number:" << nEvent << std::endl;
         if(nEvent < 0 && errno == EINTR)
         {
             Logger::log(Logger::Console, "epoll is broken.");
@@ -321,7 +320,6 @@ void* MyEvent::eventwait(void *args)
         for(int index = 0; index < nEvent; ++index)
         {
             int fd = event.m_event[index].data.fd;
-			std::cerr << "[debug] m_epoll fd: " << event.m_epollfd << " epoll ready fd:" << fd << std::endl;
             EventType type = static_cast<EventType>(event.m_event[index].events);
 
             if(event.pushTask(fd, type) == 0)

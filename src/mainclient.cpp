@@ -113,7 +113,6 @@ size_t MainClient::recv(void *buf, size_t len, int flags)
 size_t MainClient::send(const void *buf, size_t len, int flags)
 {
     std::unique_lock<std::mutex> lck(m_mutex);
-	std::cerr << "[debug mainclient.cpp] send data length:" << len << std::endl;
     if(INVALID_SOCKET == m_sockfd)
         return -1;
 

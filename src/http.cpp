@@ -332,7 +332,7 @@ int MyHTTPResponse::setBody(const std::string& body, size_t bodylen)
     if(body.empty() || bodylen == 0 || bodylen > BODYMAXSIZE)
         return -1;
 
-    char* buff = new char[bodylen];
+    char* buff = new char[bodylen + 1];
     if(buff == nullptr)
         return -1;
 
@@ -370,9 +370,9 @@ const char* MyHTTPResponse::serialize()
         delete buffserver;
         return nullptr;
     }
-
     totalsize -= nprint;
     buff += nprint;
+
 
     for(HTTPHeader_t::iterator iter = m_package.headers.begin(); iter != m_package.headers.end(); ++iter)
     {
@@ -391,7 +391,7 @@ const char* MyHTTPResponse::serialize()
     }
 	
 
-    totalsize -= nprint;
+    //totalsize -= nprint;
     nprint = snprintf(buff, totalsize, "\r\n");
     if(nprint < 0)
     {

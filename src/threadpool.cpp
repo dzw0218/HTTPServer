@@ -71,10 +71,9 @@ void* MyThreadPool::process_task(void *args)
     {
         currentThread.promote_leader();
         ThreadHandle *handler = currentThread.m_taskqueue.popTask();
-        currentThread.join_follower();
-
         if(handler)
             handler->taskHandle();
+        currentThread.join_follower();
     }
 }
 
